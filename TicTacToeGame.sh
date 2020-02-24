@@ -6,6 +6,10 @@ echo "/******************************************* WELCOME TO TIC TAC TOE GAME *
 NUMBER_OF_ROWS=3
 NUMBER_OF_COLUMNS=3
 
+# VARIABLES
+playerOneSign=0
+playerTwoSign=0
+
 # DECLARING DICTIONARY FOR GAME
 declare -A gameBoard
 
@@ -20,4 +24,19 @@ function resetGameBoard(){
 	done
 }
 
+# FUNCTION TO ASSIGN SIGN TO PLAYERS
+function assignSign(){
+	local randomValue=$((RANDOM%2))
+	if [ $randomValue -eq 1 ]
+	then
+		playerOneSign=x
+		playerTwoSign=o
+	else
+		playerOneSign=o
+		playerTwoSign=x
+	fi
+}
+
+# FUNCTION CALL TO RESET GAME BOARD AND ASSIGN SIGN
 resetGameBoard
+assignSign
