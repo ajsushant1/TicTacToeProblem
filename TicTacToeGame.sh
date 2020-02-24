@@ -37,6 +37,17 @@ function assignSign(){
 	fi
 }
 
-# FUNCTION CALL TO RESET GAME BOARD AND ASSIGN SIGN
+# FUNCTION CHECK WHO PLAY FIRST
+function toss(){
+	local randomValue=$((RANDOM%2))
+	if [ $randomValue -eq 1 ]
+	then
+		echo "Player One Play First"
+	else
+		echo "Player Two Play First"
+	fi
+}
+
 resetGameBoard
 assignSign
+toss
