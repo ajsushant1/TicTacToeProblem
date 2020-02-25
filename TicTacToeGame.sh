@@ -48,6 +48,21 @@ function toss(){
 	fi
 }
 
+# FUNCTION TO DISPLAY GAME BOARD
+function displayGameBoard(){
+	echo "----------"
+	for (( row=0; row<$NUMBER_OF_ROWS; row++ ))
+	{
+		for (( column=0; column<$NUMBER_OF_COLUMNS; column++ ))
+		{
+			echo -n "${gameBoard[$row,$column]} |"
+		}
+		printf "\n"
+		echo "----------"
+	}
+}
+
 resetGameBoard
 assignSign
 toss
+displayGameBoard
