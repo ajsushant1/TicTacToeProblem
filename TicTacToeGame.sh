@@ -52,7 +52,7 @@ function toss(){
 		playerOneTurn=1
 	else
 		echo "Player Two Play First"
-		playerTwoTurn=0
+		playerTwoTurn=2
 	fi
 }
 
@@ -118,14 +118,21 @@ function checkWinCondition(){
 # FUNCTION TO GET POSITION OF PLAYER MOVE
 function getPosition(){
 	local sign=$1
+	local playerTurn=$2
 	local rowPosition
 	local columnPosition
+	if [ $playerTurn -eq 1 ]
+	then
 	read -p "Enter row position :" rowPosition
-   read -p "Enter column position :" columnPosition
+	read -p "Enter column position :" columnPosition
+	else
+		rowPosition=$((RANDOM%$NUMBER_OF_ROWS))
+		columnPosition=$((RANDOM%$NUMBER_OF_ROWS))
+	fi
 	if [[ ${gameBoard[$rowPosition,$columnPosition]} == x || ${gameBoard[$rowPosition,$columnPosition]} == o ]]
 	then
 		echo "Position already occupied!!"
-		getPosition $sign
+		getPosition $sign $playerTurn
 	else
 		gameBoard[$rowPosition,$columnPosition]=$sign
 		((turnCount++))
@@ -136,7 +143,7 @@ resetGameBoard
 assignSign
 toss
 echo "PlayerOneSign is :$playerOneSign "
-echo "PlayerTwoSign is :$playerTwoSign "
+echo "Computer Sign is :$playerTwoSign "
 displayGameBoard
 
 # LOOP FOR SWITCH PLAYER TURN TILL WIN
@@ -147,13 +154,13 @@ do
 		if [ $playerOneTurn -eq 1 ]
 		then
 			echo "Player One Turn "
-			getPosition $playerOneSign
+			getPosition $playerOneSign $playerOneTurn
 			displayGameBoard
 			checkWinCondition $playerOneSign $playerOneTurn
 			playerOneTurn=0
 		else
-			echo "Player Two Turn "
-			getPosition $playerTwoSign
+			echo "Computer Turn "
+			getPosition $playerTwoSign $playerTwoTurn
 			displayGameBoard
 			checkWinCondition $playerTwoSign $playerTwoTurn
 			playerOneTurn=1
@@ -167,9 +174,9 @@ done
 if [[ $winnerPlayer -eq 1 ]]
 then
 	echo "Player One is Winner"
-elif [[ $winnerPlayer -eq 0 ]]
+elif [[ $winnerPlayer -eq 2 ]]
 then
-	echo "Player Two is Winner"
+	echo "Computer is Winner"
 else
 	echo "Match is tie"
 fi
