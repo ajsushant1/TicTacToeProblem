@@ -5,16 +5,18 @@ echo "/******************************************* WELCOME TO TIC TAC TOE GAME *
 # CONSTANTS
 NUMBER_OF_ROWS=3
 NUMBER_OF_COLUMNS=3
+EMPTY=" "
 
 # VARIABLES
-playerOneSign=0
-playerTwoSign=0
-playerOneTurn=0
-playerTwoTurn=0
+playerSign=0
+computerSign=0
+playerTurn=0
+computerTurn=0
 win=0
 winnerPlayer=0
 totalTurnCount=9
 turnCount=0
+isAvailable=0
 
 # DECLARING DICTIONARY FOR GAME
 declare -A gameBoard
@@ -35,11 +37,11 @@ function assignSign(){
 	local randomValue=$((RANDOM%2))
 	if [ $randomValue -eq 1 ]
 	then
-		playerOneSign=x
-		playerTwoSign=o
+		playerSign=x
+		computerSign=o
 	else
-		playerOneSign=o
-		playerTwoSign=x
+		playerSign=o
+		computerSign=x
 	fi
 }
 
@@ -48,11 +50,11 @@ function toss(){
 	local randomValue=$((RANDOM%2))
 	if [ $randomValue -eq 1 ]
 	then
-		echo "Player One Play First"
-		playerOneTurn=1
+		echo "Player Play First"
+		playerTurn=1
 	else
-		echo "Player Two Play First"
-		playerTwoTurn=2
+		echo "Computer play First"
+		playerTurn=2
 	fi
 }
 
@@ -115,35 +117,100 @@ function checkWinCondition(){
 	}
 }
 
-# FUNCTION TO GET POSITION OF PLAYER MOVE
-function getPosition(){
-	local sign=$1
-	local playerTurn=$2
-	local rowPosition
-	local columnPosition
-	if [ $playerTurn -eq 1 ]
-	then
-	read -p "Enter row position :" rowPosition
-	read -p "Enter column position :" columnPosition
-	else
-		rowPosition=$((RANDOM%$NUMBER_OF_ROWS))
-		columnPosition=$((RANDOM%$NUMBER_OF_ROWS))
-	fi
-	if [[ ${gameBoard[$rowPosition,$columnPosition]} == x || ${gameBoard[$rowPosition,$columnPosition]} == o ]]
-	then
-		echo "Position already occupied!!"
-		getPosition $sign $playerTurn
-	else
-		gameBoard[$rowPosition,$columnPosition]=$sign
-		((turnCount++))
-	fi
+# CHECKING WINNING POSIBILITIES
+function checkWinPosibility(){
+local sign=$1
+local row=0
+local column=0
+
+# VERTICAL POSIBILITIES
+	for (( row=0; row<3; row++ ))
+	{
+		if [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$row,$(($column+1))]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
+		then
+			gameBoard[$row,$column]=$sign
+			isAvailable=1
+			return
+		elif [[ ${gameBoard[$row,$(($column+1))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
+		then
+			gameBoard[$row,$(($column+1))]=$sign
+			isAvailable=1
+			return
+		elif [[ ${gameBoard[$row,$(($column+2))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$row,$(($column+1))]} == $sign$sign ]]
+		then
+			gameBoard[$row,$(($column+2))]=$sign
+			isAvailable=1
+			return
+		fi
+	}
+
+# HORIZONTAL POSIBILITIES
+row=0
+column=0
+	for (( column=0; column<3; column++ ))
+	{
+		if [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$(($row+1)),$column]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
+		then
+			gameBoard[$row,$column]=$sign
+			isAvailable=1
+			return
+		elif [[ ${gameBoard[$(($row+1)),$column]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
+		then
+			gameBoard[$(($row+1)),$column]=$sign
+			isAvailable=1
+			return
+		elif [[ ${gameBoard[$(($row+2)),$column]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+1)),$column]} == $sign$sign ]]
+		then
+			gameBoard[$(($row+2)),$column]=$sign
+			isAvailable=1
+			return
+		fi
+	}
+
+# DIAGONAL POSIBILITIES
+row=0
+column=0
+		if [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$(($row+1)),$(($column+1))]}${gameBoard[$(($row+2)),$(($column+2))]} == $sign$sign ]]
+		then
+			gameBoard[$row,$column]=$sign
+			isAvailable=1
+			return
+		elif [[ ${gameBoard[$(($row+1)),$(($column+1))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+2)),$(($column+2))]} == $sign$sign ]]
+		then
+			gameBoard[$(($row+1)),$(($column+1))]=$sign
+			isAvailable=1
+			return
+		elif [[ ${gameBoard[$(($row+2)),$(($column+2))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+1)),$(($column+1))]} == $sign$sign ]]
+		then
+			gameBoard[$(($row+2)),$(($column+2))]=$sign
+			isAvailable=1
+			return
+		fi
+row=0
+column=0
+		if [[ ${gameBoard[$row,$(($column+2))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
+		then
+			gameBoard[$row,$(($column+2))]=$sign
+			isAvailable=1
+			return
+		elif [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$row,$(($column+2))]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
+		then
+			gameBoard[$row,$column]=$sign
+			isAvailable=1
+			return
+		elif [[ ${gameBoard[$(($row+2)),$column]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
+		then
+			gameBoard[$(($row+2)),$column]=$sign
+			isAvailable=1
+			return
+		fi
 }
 
 resetGameBoard
 assignSign
 toss
-echo "PlayerOneSign is :$playerOneSign "
-echo "Computer Sign is :$playerTwoSign "
+echo "PlayerOneSign is :$playerSign "
+echo "Computer Sign is :$computerSign "
 displayGameBoard
 
 # LOOP FOR SWITCH PLAYER TURN TILL WIN
@@ -151,19 +218,40 @@ while [ $win -ne 1 ]
 do
 	if [[ $turnCount -lt $totalTurnCount ]]
 	then
-		if [ $playerOneTurn -eq 1 ]
+		if [ $playerTurn -eq 1 ]
 		then
-			echo "Player One Turn "
-			getPosition $playerOneSign $playerOneTurn
+			read -p "Enter row position :" rowPosition
+			read -p "Enter column position :" columnPosition
+			while [[ ${gameBoard[$rowPosition,$columnPosition]} != $EMPTY ]]
+			do
+				echo "Position already occupied!!"
+				read -p "Enter row position :" rowPosition
+				read -p "Enter column position :" columnPosition
+			done
+			gameBoard[$rowPosition,$columnPosition]=$playerSign
 			displayGameBoard
-			checkWinCondition $playerOneSign $playerOneTurn
-			playerOneTurn=0
+			checkWinCondition $playerSign $playerTurn
+			((turnCount++))
+			playerTurn=2
 		else
+			isAvailable=0
 			echo "Computer Turn "
-			getPosition $playerTwoSign $playerTwoTurn
+			checkWinPosibility $computerSign
+			if [ $isAvailable -eq 0 ]
+			then
+				rowPosition=$((RANDOM%$NUMBER_OF_ROWS))
+				columnPosition=$((RANDOM%$NUMBER_OF_ROWS))
+				while [[ ${gameBoard[$rowPosition,$columnPosition]} != $EMPTY ]]
+				do
+					rowPosition=$((RANDOM%$NUMBER_OF_ROWS))
+					columnPosition=$((RANDOM%$NUMBER_OF_ROWS))
+				done
+				gameBoard[$rowPosition,$columnPosition]=$computerSign
+				((turnCount++))
+			fi
 			displayGameBoard
-			checkWinCondition $playerTwoSign $playerTwoTurn
-			playerOneTurn=1
+			checkWinCondition $computerSign $playerTurn
+			playerTurn=1
 		fi
 	else
 		break
