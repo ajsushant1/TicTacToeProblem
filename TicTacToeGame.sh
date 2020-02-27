@@ -81,30 +81,33 @@ function checkWinCondition(){
 	local diagonalFlag2=0
 	local verticalFlag=0
 	local horizontalFlag=0
-	for (( r=0; r<$NUMBER_OF_ROWS; r++ ))
+	for (( row=0; row<$NUMBER_OF_ROWS; row++ ))
 	{
 		horizontalFlag=0
 		verticalFlag=0
-		for (( c=0; c<$NUMBER_OF_COLUMNS; c++ ))
+		for (( column=0; column<$NUMBER_OF_COLUMNS; column++ ))
 		{
-			if [[ ${gameBoard[$r,$c]} == $sign ]]
+			# CHECKING HORIZONTAL WINNING CONDITION
+			if [[ ${gameBoard[$row,$column]} == $sign ]]
 			then
 				((horizontalFlag++))
 			fi
-			if [[ ${gameBoard[$c,$r]} == $sign ]]
+			# CHECKING VERTICAL WINNING CONDITION
+			if [[ ${gameBoard[$column,$row]} == $sign ]]
 			then
 				((verticalFlag++))
 			fi
-			if [[ $r == $c ]]
+			# CHECKING DIAGONAL WINNING CONDITION
+			if [[ $row == $column ]]
 			then
-				if [[ ${gameBoard[$r,$c]} == $sign ]]
+				if [[ ${gameBoard[$row,$column]} == $sign ]]
 				then
 					((diagonalFlag1++))
 				fi
 			fi
 
 		}
-		if [[ ${gameBoard[$r,$(($NUMBER_OF_ROWS-$r-1))]} == $sign ]]
+		if [[ ${gameBoard[$r,$(($NUMBER_OF_ROWS-$row-1))]} == $sign ]]
 		then
 			((diagonalFlag2++))
 		fi
@@ -129,17 +132,17 @@ local column=0
 	{
 		if [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$row,$(($column+1))]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
 		then
-			gameBoard[$row,$column]=$sign
+			gameBoard[$row,$column]=$computerSign
 			isAvailable=1
 			return
 		elif [[ ${gameBoard[$row,$(($column+1))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
 		then
-			gameBoard[$row,$(($column+1))]=$sign
+			gameBoard[$row,$(($column+1))]=$computerSign
 			isAvailable=1
 			return
 		elif [[ ${gameBoard[$row,$(($column+2))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$row,$(($column+1))]} == $sign$sign ]]
 		then
-			gameBoard[$row,$(($column+2))]=$sign
+			gameBoard[$row,$(($column+2))]=$computerSign
 			isAvailable=1
 			return
 		fi
@@ -152,17 +155,17 @@ column=0
 	{
 		if [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$(($row+1)),$column]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
 		then
-			gameBoard[$row,$column]=$sign
+			gameBoard[$row,$column]=$computerSign
 			isAvailable=1
 			return
 		elif [[ ${gameBoard[$(($row+1)),$column]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
 		then
-			gameBoard[$(($row+1)),$column]=$sign
+			gameBoard[$(($row+1)),$column]=$computerSign
 			isAvailable=1
 			return
 		elif [[ ${gameBoard[$(($row+2)),$column]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+1)),$column]} == $sign$sign ]]
 		then
-			gameBoard[$(($row+2)),$column]=$sign
+			gameBoard[$(($row+2)),$column]=$computerSign
 			isAvailable=1
 			return
 		fi
@@ -173,17 +176,17 @@ row=0
 column=0
 		if [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$(($row+1)),$(($column+1))]}${gameBoard[$(($row+2)),$(($column+2))]} == $sign$sign ]]
 		then
-			gameBoard[$row,$column]=$sign
+			gameBoard[$row,$column]=$computerSign
 			isAvailable=1
 			return
 		elif [[ ${gameBoard[$(($row+1)),$(($column+1))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+2)),$(($column+2))]} == $sign$sign ]]
 		then
-			gameBoard[$(($row+1)),$(($column+1))]=$sign
+			gameBoard[$(($row+1)),$(($column+1))]=$computerSign
 			isAvailable=1
 			return
 		elif [[ ${gameBoard[$(($row+2)),$(($column+2))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+1)),$(($column+1))]} == $sign$sign ]]
 		then
-			gameBoard[$(($row+2)),$(($column+2))]=$sign
+			gameBoard[$(($row+2)),$(($column+2))]=$computerSign
 			isAvailable=1
 			return
 		fi
@@ -191,17 +194,17 @@ row=0
 column=0
 		if [[ ${gameBoard[$row,$(($column+2))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
 		then
-			gameBoard[$row,$(($column+2))]=$sign
+			gameBoard[$row,$(($column+2))]=$computerSign
 			isAvailable=1
 			return
 		elif [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$row,$(($column+2))]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
 		then
-			gameBoard[$row,$column]=$sign
+			gameBoard[$row,$column]=$computerSign
 			isAvailable=1
 			return
 		elif [[ ${gameBoard[$(($row+2)),$column]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
 		then
-			gameBoard[$(($row+2)),$column]=$sign
+			gameBoard[$(($row+2)),$column]=$computerSign
 			isAvailable=1
 			return
 		fi
@@ -240,6 +243,10 @@ do
 			checkWinPosibility $computerSign
 			if [ $isAvailable -eq 0 ]
 			then
+				checkWinPosibility $playerSign
+			fi
+			if [ $isAvailable -eq 0 ]
+			then
 				rowPosition=$((RANDOM%$NUMBER_OF_ROWS))
 				columnPosition=$((RANDOM%$NUMBER_OF_ROWS))
 				while [[ ${gameBoard[$rowPosition,$columnPosition]} != $EMPTY ]]
@@ -248,8 +255,8 @@ do
 					columnPosition=$((RANDOM%$NUMBER_OF_ROWS))
 				done
 				gameBoard[$rowPosition,$columnPosition]=$computerSign
-				((turnCount++))
 			fi
+			((turnCount++))
 			displayGameBoard
 			checkWinCondition $computerSign $playerTurn
 			playerTurn=1
