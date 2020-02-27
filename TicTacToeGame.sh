@@ -76,6 +76,7 @@ function displayGameBoard(){
 function checkWinCondition(){
 	local sign=$1
 	local winner=$2
+	local flagCount=3
 	local diagonalFlag1=0
 	local diagonalFlag2=0
 	local verticalFlag=0
@@ -108,7 +109,7 @@ function checkWinCondition(){
 			((diagonalFlag2++))
 		fi
 
-		if [[ $horizontalFlag -eq 3 || $verticalFlag -eq 3 || $diagonalFlag1 -eq 3 || $diagonalFlag2 -eq 3 ]]
+		if [[ $horizontalFlag -eq $flagCount || $verticalFlag -eq $flagCount || $diagonalFlag1 -eq $flagCount || $diagonalFlag2 -eq $flagCount ]]
 		then
 			win=1
 			winnerPlayer=$winner
@@ -124,7 +125,7 @@ local row=0
 local column=0
 
 # VERTICAL POSIBILITIES
-	for (( row=0; row<3; row++ ))
+	for (( row=0; row<$NUMBER_OF_COLUMNS; row++ ))
 	{
 		if [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$row,$(($column+1))]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
 		then
@@ -147,7 +148,7 @@ local column=0
 # HORIZONTAL POSIBILITIES
 row=0
 column=0
-	for (( column=0; column<3; column++ ))
+	for (( column=0; column<$NUMBER_OF_COLUMNS; column++ ))
 	{
 		if [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$(($row+1)),$column]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
 		then
