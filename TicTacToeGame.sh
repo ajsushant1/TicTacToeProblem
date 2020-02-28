@@ -287,6 +287,7 @@ do
 			then
 				checkCentre
 			fi
+			# GENERATING RANDOM ROW AND COLUMN POSTIONS FOR MOVE OF COMPUTER
 			if [ $isAvailable -eq 0 ]
 			then
 				rowPosition=$((RANDOM%$NUMBER_OF_ROWS))
