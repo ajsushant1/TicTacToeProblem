@@ -220,7 +220,6 @@ function checkCorner(){
 	do
 		rowPosition=$((RANDOM%$NUMBER_OF_ROWS))
 		columnPosition=$((RANDOM%$NUMBER_OF_ROWS))
-		echo "$rowPosition $columnPosition"
 		if [[ $(((($rowPosition+$columnPosition))%2)) == 0 && $columnPosition != 1 ]]
 		then
 			((count++))
@@ -228,12 +227,22 @@ function checkCorner(){
 			then
 				gameBoard[$rowPosition,$columnPosition]=$computerSign
 				isAvailable=1
-         	break
+				break
 			fi
 		fi
 	done
 }
 
+# FUNCTION TO CHECK FOR CENTRE
+function checkCentre(){
+	local row=0
+	local column=0
+	if [[ ${gameBoard[$(($row+1)),$(($column+1))]} == $EMPTY ]]
+	then
+		gameBoard[$(($row+1)),$(($column+1))]=$computerSign
+		isAvailable=1
+	fi
+}
 
 resetGameBoard
 assignSign
@@ -273,6 +282,10 @@ do
 			if [ $isAvailable -eq 0 ]
 			then
 				checkCorner
+			fi
+			if [ $isAvailable -eq 0 ]
+			then
+				checkCentre
 			fi
 			if [ $isAvailable -eq 0 ]
 			then
