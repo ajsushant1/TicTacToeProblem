@@ -107,7 +107,7 @@ function checkWinCondition(){
 			fi
 
 		}
-		if [[ ${gameBoard[$r,$(($NUMBER_OF_ROWS-$row-1))]} == $sign ]]
+		if [[ ${gameBoard[$row,$(($NUMBER_OF_ROWS-$row-1))]} == $sign ]]
 		then
 			((diagonalFlag2++))
 		fi
@@ -192,23 +192,48 @@ column=0
 		fi
 row=0
 column=0
-		if [[ ${gameBoard[$row,$(($column+2))]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
+		if [[ ${gameBoard[$row,$(($column+2))]} == $EMPTY && ${gameBoard[$(($row+1)),$(($column+1))]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
 		then
 			gameBoard[$row,$(($column+2))]=$computerSign
 			isAvailable=1
 			return
-		elif [[ ${gameBoard[$row,$column]} == $EMPTY && ${gameBoard[$row,$(($column+2))]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
+		elif [[ ${gameBoard[$(($row+1)),$(($column+1))]} == $EMPTY && ${gameBoard[$row,$(($column+2))]}${gameBoard[$(($row+2)),$column]} == $sign$sign ]]
 		then
-			gameBoard[$row,$column]=$computerSign
+			gameBoard[$(($row+1)),$(($column+1))]=$computerSign
 			isAvailable=1
 			return
-		elif [[ ${gameBoard[$(($row+2)),$column]} == $EMPTY && ${gameBoard[$row,$column]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
+		elif [[ ${gameBoard[$(($row+2)),$column]} == $EMPTY && ${gameBoard[$(($row+1)),$(($column+1))]}${gameBoard[$row,$(($column+2))]} == $sign$sign ]]
 		then
 			gameBoard[$(($row+2)),$column]=$computerSign
 			isAvailable=1
 			return
 		fi
 }
+
+# FUNCTION TO CHECK CORNERS
+function checkCorner(){
+	local rowPosition=0
+	local columnPosition=0
+	local count=0
+	local numberOfCorners=4
+	while [[ $count -lt $numberOfCorners ]]
+	do
+		rowPosition=$((RANDOM%$NUMBER_OF_ROWS))
+		columnPosition=$((RANDOM%$NUMBER_OF_ROWS))
+		echo "$rowPosition $columnPosition"
+		if [[ $(((($rowPosition+$columnPosition))%2)) == 0 && $columnPosition != 1 ]]
+		then
+			((count++))
+			if [[ ${gameBoard[$rowPosition,$columnPosition]} == $EMPTY ]]
+			then
+				gameBoard[$rowPosition,$columnPosition]=$computerSign
+				isAvailable=1
+         	break
+			fi
+		fi
+	done
+}
+
 
 resetGameBoard
 assignSign
@@ -244,6 +269,10 @@ do
 			if [ $isAvailable -eq 0 ]
 			then
 				checkWinPosibility $playerSign
+			fi
+			if [ $isAvailable -eq 0 ]
+			then
+				checkCorner
 			fi
 			if [ $isAvailable -eq 0 ]
 			then
